@@ -6,7 +6,8 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/rvflash/flat?)](https://goreportcard.com/report/github.com/rvflash/flat)
 
 
-The package `flat` provides methods to handle XML or JSON data as a `map[string]interface`.
+The package `flat` provides methods to handle XML or JSON data as a `map[string]interface`, 
+useful to manipulate unknown structures or to flatten them into a single dimension.
 
 
 ### Installation

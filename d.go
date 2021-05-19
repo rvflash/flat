@@ -61,7 +61,7 @@ const (
 // []interface{}, for arrays
 // map[string]interface{}, for objects.
 func New(m map[string]interface{}, opts ...Settings) *D {
-	d := &D{m: m}
+	d := &D{D: m}
 	for _, opt := range append([]Settings{
 		XMLArray(DefaultXMLArraySep),
 		XMLName(DefaultXMLName),
@@ -73,7 +73,7 @@ func New(m map[string]interface{}, opts ...Settings) *D {
 
 // D represents a data.
 type D struct {
-	m             map[string]interface{}
+	D             map[string]interface{}
 	xmlArraySep   string
 	xmlAttributes []xml.Attr
 	xmlName       string
@@ -88,14 +88,14 @@ const (
 // Any of its properties, absent from the list of ignored keys, are lifted to the first level.
 // Each property has a new name, using the snake case, based on names of its hierarchy.
 func (d D) Flatten(ignoredKeys ...[]string) map[string]interface{} {
-	if len(d.m) == 0 {
+	if len(d.D) == 0 {
 		return nil
 	}
 	not := make(map[string]struct{}, len(ignoredKeys))
 	for _, v := range ignoredKeys {
 		not[naming.SnakeCase(strings.Join(v, levelSep))] = struct{}{}
 	}
-	return flatten(d.m, not, rootName)
+	return flatten(d.D, not, rootName)
 }
 
 func flatten(in map[string]interface{}, not map[string]struct{}, root string) map[string]interface{} {
@@ -128,7 +128,7 @@ func (d D) Lookup(keys ...string) (interface{}, error) {
 		return nil, ErrNotFound
 	}
 	var (
-		v  interface{} = d.m
+		v  interface{} = d.D
 		m  map[string]interface{}
 		ok bool
 	)
@@ -152,18 +152,18 @@ func (d D) JSONEncode(w io.Writer) error {
 
 // MarshalJSON implements the json.Marshaler interface.
 func (d D) MarshalJSON() ([]byte, error) {
-	return json.Marshal(d.m)
+	return json.Marshal(d.D)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (d *D) UnmarshalJSON(b []byte) (err error) {
 	if b == nil {
-		d.m = nil
+		d.D = nil
 		return
 	}
 	dec := json.NewDecoder(bytes.NewReader(b))
 	dec.UseNumber()
-	return dec.Decode(&d.m)
+	return dec.Decode(&d.D)
 }
 
 // XMLEncode XML encodes D into w.
@@ -173,12 +173,12 @@ func (d D) XMLEncode(w io.Writer) error {
 
 // MarshalXML implements the xml.Marshaler interface.
 func (d D) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
-	if len(d.m) == 0 {
+	if len(d.D) == 0 {
 		return nil
 	}
 	start.Name.Local = d.xmlName
 	start.Attr = d.xmlAttributes
-	return marshallXML(d.m, enc, start, d.xmlArraySep)
+	return marshallXML(d.D, enc, start, d.xmlArraySep)
 }
 
 type charData struct {
@@ -229,8 +229,8 @@ func (d *D) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 			grow = false
 		}
 	}
-	d.m = make(map[string]interface{})
-	return expanded(temp, d.m)
+	d.D = make(map[string]interface{})
+	return expanded(temp, d.D)
 }
 
 func expanded(in, out map[string]interface{}) error {
