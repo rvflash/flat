@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"io"
+	"sort"
 	"strings"
 	"time"
 
@@ -92,11 +93,13 @@ type D struct {
 const (
 	levelSep = " "
 	rootName = ""
+	keySep   = '_'
 )
 
 // Flatten allows to export D in a single dimension.
 // Any of its properties, absent from the list of ignored keys, are lifted to the first level.
 // Each property has a new name, using the snake case, based on names of its hierarchy.
+// Common prefix in keys name are omitted to limit the length of each ones.
 func (d D) Flatten(ignoredKeys ...[]string) map[string]interface{} {
 	if len(d.D) == 0 {
 		return nil
@@ -105,7 +108,7 @@ func (d D) Flatten(ignoredKeys ...[]string) map[string]interface{} {
 	for _, v := range ignoredKeys {
 		not[naming.SnakeCase(strings.Join(v, levelSep))] = struct{}{}
 	}
-	return flatten(d.D, not, rootName)
+	return simplify(flatten(d.D, not, rootName))
 }
 
 func flatten(in map[string]interface{}, not map[string]struct{}, root string) map[string]interface{} {
@@ -129,6 +132,52 @@ func flatten(in map[string]interface{}, not map[string]struct{}, root string) ma
 		}
 	}
 	return out
+}
+
+func simplify(in map[string]interface{}) map[string]interface{} {
+	prefix := commonPrefix(in)
+	if prefix == "" {
+		return in
+	}
+	out := make(map[string]interface{}, len(in))
+	for k, v := range in {
+		out[strings.TrimPrefix(k, prefix)] = v
+	}
+	return out
+}
+
+func commonPrefix(in map[string]interface{}) string {
+	n := len(in)
+	if n <= 1 {
+		return ""
+	}
+	var (
+		i   int
+		x   = make([]string, n)
+		min = func(a, b int) int {
+			if a > b {
+				return b
+			}
+			return a
+		}
+	)
+	// Sorts keys.
+	for k := range in {
+		x[i] = k
+		i++
+	}
+	sort.Strings(x)
+	// Identifies the common prefix.
+	r1, r2 := []rune(x[0]), []rune(x[n-1])
+	c := min(len(r1), len(r2))
+	i = 0
+	for i < c && r1[i] == r2[i] {
+		i++
+	}
+	if i == 0 || r1[i-1] != keySep {
+		return ""
+	}
+	return string(r1[:i])
 }
 
 // Lookup retrieves the value behind these keys.
