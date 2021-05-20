@@ -36,7 +36,7 @@ const (
   "string": "Hello World"
 }`
 	xmlStr = `
-<root>
+<root xmlns:hyp="hyp">
   <array>1|2|3</array>
   <boolean>true</boolean>
   <null></null>
@@ -90,7 +90,7 @@ func TestD_Flatten(t *testing.T) {
 					"array":      []interface{}{float64(1), float64(2), float64(3)},
 					"boolean":    true,
 					"null":       nil,
-					"hyp:number": float64(123),
+					"hyp_number": float64(123),
 					"object_a":   "b",
 					"object_c":   "d",
 					"object_e":   "f",
@@ -220,7 +220,7 @@ func TestD_UnmarshalXML(t *testing.T) {
 		"array":      "1|2|3", // todo in the next release: []interface{}{"1","2","3"}
 		"boolean":    "true",  // todo in the next release: true
 		"null":       "\n  ",  // todo in the next release: nil
-		"hyp:number": "123",
+		"hyp_number": "123",
 		"object_a":   "b",
 		"object_c":   "d",
 		"object_e":   "f",

@@ -37,6 +37,15 @@ func XMLName(s string) Settings {
 	}
 }
 
+// XMLNS allows to define the XML namespace of the data.
+func XMLNS(s string) Settings {
+	return func(d *D) {
+		if s != "" {
+			d.xmlns = s
+		}
+	}
+}
+
 // XMLAttributes sets the given list of attributes on the XML root data.
 func XMLAttributes(list []xml.Attr) Settings {
 	return func(d *D) {
@@ -77,6 +86,7 @@ type D struct {
 	xmlArraySep   string
 	xmlAttributes []xml.Attr
 	xmlName       string
+	xmlns         string
 }
 
 const (
@@ -177,6 +187,7 @@ func (d D) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
 		return nil
 	}
 	start.Name.Local = d.xmlName
+	start.Name.Space = d.xmlns
 	start.Attr = d.xmlAttributes
 	return marshallXML(d.D, enc, start, d.xmlArraySep)
 }
@@ -208,15 +219,22 @@ func marshallXML(m map[string]interface{}, enc *xml.Encoder, start xml.StartElem
 // UnmarshalXML implements the xml.Unmarshaler interface.
 func (d *D) UnmarshalXML(dec *xml.Decoder, start xml.StartElement) error {
 	var (
+		attr = func(list []xml.Attr) map[string]string {
+			m := make(map[string]string, len(list))
+			for _, v := range list {
+				m[v.Value] = v.Name.Local
+			}
+			return m
+		}(start.Attr)
+		tree       = []string{xmlName(start.Name, attr)}
 		temp       = make(map[string]interface{})
-		tree       = []string{xmlName(start.Name)}
 		name, data string
 		grow       bool
 	)
 	for token, err := dec.Token(); err == nil; token, err = dec.Token() {
 		switch t := token.(type) {
 		case xml.StartElement:
-			tree = append(tree, xmlName(t.Name))
+			tree = append(tree, xmlName(t.Name, attr))
 			grow = true
 		case xml.CharData:
 			data = string(t)
@@ -259,9 +277,9 @@ const (
 	xmlLevelSep = ">"
 )
 
-func xmlName(name xml.Name) string {
-	if name.Space != "" {
-		return name.Space + xmlNSSep + name.Local
+func xmlName(name xml.Name, space map[string]string) string {
+	if ns, ok := space[name.Space]; ok {
+		return ns + xmlNSSep + name.Local
 	}
 	return name.Local
 }

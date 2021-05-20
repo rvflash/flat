@@ -23,12 +23,17 @@ func ExampleD_XMLEncode() {
 		attrs = []xml.Attr{
 			{Name: xml.Name{Local: "xmlns:xsi"}, Value: "http://www.w3.org/2001/XMLSchema-instance"},
 		}
-		err = flat.New(d, flat.XMLName("custom"), flat.XMLAttributes(attrs)).XMLEncode(&res)
+		err = flat.New(
+			d,
+			flat.XMLName("custom"),
+			flat.XMLNS("http://schemas.xmlsoap.org/soap/envelope/"),
+			flat.XMLAttributes(attrs),
+		).XMLEncode(&res)
 	)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(res.String())
 	// Output:
-	// <custom xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><languages><fr>French</fr></languages></custom>
+	// <custom xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><languages><fr>French</fr></languages></custom>
 }

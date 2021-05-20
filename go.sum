@@ -4,4 +4,6 @@ github.com/matryer/is v1.4.0 h1:sosSmIWwkYITGrxZ25ULNDeKiMNzFSr4V/eqBQP0PeE=
 github.com/matryer/is v1.4.0/go.mod h1:8I/i5uYgLzgsgEloJE1U6xx5HkBQpAZvepWuujKwMRU=
 github.com/rvflash/naming v1.0.1 h1:2Hex6nynVf2tel+I/0CGdAO1KQJXFHeskRR2Pln+IbE=
 github.com/rvflash/naming v1.0.1/go.mod h1:OSRr27wSV1R4BUwTNTus2iv7kPMFTFc8LJDRKgIDU0A=
+github.com/rvflash/naming v1.0.2 h1:dWtu9Vg/TaqNqSJwaKgb7K95bYPWe2rf1ceAXI5h1LE=
+github.com/rvflash/naming v1.0.2/go.mod h1:OSRr27wSV1R4BUwTNTus2iv7kPMFTFc8LJDRKgIDU0A=
 golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543/go.mod h1:I/5z698sn9Ka8TeJc9MKroUUfqBBauWjQqLJ2OPfmY0=
