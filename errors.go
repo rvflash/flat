@@ -16,7 +16,7 @@ func (s errFlat) Error() string {
 const (
 	// ErrNotFound is returned when the key is unknown.
 	ErrNotFound = errFlat("not found")
-	// ErrOutFoRange is returned when the type of data requested does not correspond to that of the data.
+	// ErrOutOfRange is returned when the type of data requested does not correspond to that of the data.
 	ErrOutOfRange = errFlat("wrong data type")
 )
 

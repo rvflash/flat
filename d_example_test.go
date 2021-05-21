@@ -37,3 +37,16 @@ func ExampleD_XMLEncode() {
 	// Output:
 	// <custom xmlns="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><languages><fr>French</fr></languages></custom>
 }
+
+func ExampleD_UnmarshalXML() {
+	var (
+		d   = flat.D{}
+		err = xml.Unmarshal([]byte(`<custom><languages><fr>French</fr></languages></custom>`), &d)
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Printf("%#v", d.Flatten())
+	// Output:
+	// map[string]interface {}{"languages_fr":"French"}
+}
