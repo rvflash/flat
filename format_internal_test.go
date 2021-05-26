@@ -125,6 +125,8 @@ func TestToString(t *testing.T) {
 			err error
 		}{
 			"Default": {err: ErrOutOfRange},
+			"Bool":    {in: true, out: "", err: ErrOutOfRange},
+			"Number":  {in: json.Number("-42"), out: "-42"},
 			"OK":      {in: "oops", out: "oops"},
 		}
 	)

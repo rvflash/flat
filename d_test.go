@@ -373,11 +373,11 @@ func TestD_Strings(t *testing.T) {
 			out  []string
 			err  error
 		}{
-			"Default":    {err: flat.ErrNotFound},
-			"Unknown":    {keys: []string{"oops"}, err: flat.ErrNotFound},
-			"Invalid":    {keys: []string{"bool"}, err: flat.ErrOutOfRange},
-			"Wrong type": {keys: []string{"numbers"}, err: flat.ErrOutOfRange},
-			"OK":         {keys: []string{"strings"}, out: []string{"4", "2"}},
+			"Default": {err: flat.ErrNotFound},
+			"Unknown": {keys: []string{"oops"}, err: flat.ErrNotFound},
+			"Invalid": {keys: []string{"bool"}, err: flat.ErrOutOfRange},
+			"Number":  {keys: []string{"numbers"}, out: []string{"1"}},
+			"OK":      {keys: []string{"strings"}, out: []string{"4", "2"}},
 		}
 	)
 	for name, tt := range dt {

@@ -78,11 +78,15 @@ func toInt64(m interface{}) (int64, error) {
 }
 
 func toString(m interface{}) (string, error) {
-	s, ok := m.(string)
-	if !ok {
-		return "", newErrOutOfRange("", m)
+	switch v := m.(type) {
+	case json.Number:
+		return v.String(), nil
+	case string:
+		return v, nil
+	default:
+		var x string
+		return x, newErrOutOfRange(x, v)
 	}
-	return s, nil
 }
 
 func toUint64(m interface{}) (uint64, error) {
