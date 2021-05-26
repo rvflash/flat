@@ -343,6 +343,13 @@ func (d D) Bool(keys ...string) (bool, error) {
 	return toBool(m)
 }
 
+// ShouldBool returns the value behind these keys as a bool.
+// The default type value is used if the key does not exist or if the data failed to be cast as a boolean.
+func (d D) ShouldBool(keys ...string) bool {
+	v, _ := d.Bool(keys...)
+	return v
+}
+
 // Float64 forces the returned value behind these keys as a float64.
 // An error is returned if the key does not exist or if the requested type is wrong.
 func (d D) Float64(keys ...string) (float64, error) {
@@ -351,6 +358,13 @@ func (d D) Float64(keys ...string) (float64, error) {
 		return 0, err
 	}
 	return toFloat64(m)
+}
+
+// ShouldFloat64 returns the value behind these keys as a float64.
+// The default type value is used if the key does not exist or if the data failed to be cast as a float64.
+func (d D) ShouldFloat64(keys ...string) float64 {
+	v, _ := d.Float64(keys...)
+	return v
 }
 
 // Int64 forces the returned value behind these keys as an int64.
@@ -363,6 +377,13 @@ func (d D) Int64(keys ...string) (int64, error) {
 	return toInt64(m)
 }
 
+// ShouldInt64 returns the value behind these keys as an int64.
+// The default type value is used if the key does not exist or if the data failed to be cast as an int64.
+func (d D) ShouldInt64(keys ...string) int64 {
+	v, _ := d.Int64(keys...)
+	return v
+}
+
 // String forces the returned value behind these keys as a string.
 // An error is returned if the key does not exist or if the requested type is wrong.
 func (d D) String(keys ...string) (string, error) {
@@ -371,6 +392,13 @@ func (d D) String(keys ...string) (string, error) {
 		return "", err
 	}
 	return toString(m)
+}
+
+// ShouldString returns the value behind these keys as a string.
+// The default type value is used if the key does not exist or if the data failed to be cast as a string.
+func (d D) ShouldString(keys ...string) string {
+	v, _ := d.String(keys...)
+	return v
 }
 
 // Strings returns if exists, the content of the given key as a slice of strings.
@@ -407,6 +435,13 @@ func (d D) Time(layout string, keys ...string) (time.Time, error) {
 	return time.Parse(layout, s)
 }
 
+// ShouldTime returns the value behind these keys as a time.Time.
+// The default type value is used if the key does not exist or if the data failed to be cast as a time.Time.
+func (d D) ShouldTime(layout string, keys ...string) time.Time {
+	v, _ := d.Time(layout, keys...)
+	return v
+}
+
 // Uint64 forces the returned value behind these keys as an uint64.
 // An error is returned if the key does not exist or if the requested type is wrong.
 func (d D) Uint64(keys ...string) (uint64, error) {
@@ -415,4 +450,11 @@ func (d D) Uint64(keys ...string) (uint64, error) {
 		return 0, err
 	}
 	return toUint64(m)
+}
+
+// ShouldUint64 returns the value behind these keys as an uint64.
+// The default type value is used if the key does not exist or if the data failed to be cast as an uint64.
+func (d D) ShouldUint64(keys ...string) uint64 {
+	v, _ := d.Uint64(keys...)
+	return v
 }
