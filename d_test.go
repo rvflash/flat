@@ -364,20 +364,22 @@ func TestD_Strings(t *testing.T) {
 	var (
 		are = is.New(t)
 		d   = flat.New(map[string]interface{}{
-			"numbers": []interface{}{json.Number("1")},
-			"bool":    true,
-			"strings": []interface{}{"4", "2"},
+			"numbers":  []interface{}{json.Number("1")},
+			"booleans": []interface{}{true},
+			"bool":     true,
+			"strings":  []interface{}{"4", "2"},
 		})
 		dt = map[string]struct {
 			keys []string
 			out  []string
 			err  error
 		}{
-			"Default": {err: flat.ErrNotFound},
-			"Unknown": {keys: []string{"oops"}, err: flat.ErrNotFound},
-			"Invalid": {keys: []string{"bool"}, err: flat.ErrOutOfRange},
-			"Number":  {keys: []string{"numbers"}, out: []string{"1"}},
-			"OK":      {keys: []string{"strings"}, out: []string{"4", "2"}},
+			"Default":    {err: flat.ErrNotFound},
+			"Unknown":    {keys: []string{"oops"}, err: flat.ErrNotFound},
+			"Invalid":    {keys: []string{"bool"}, err: flat.ErrOutOfRange},
+			"Wrong type": {keys: []string{"booleans"}, err: flat.ErrOutOfRange},
+			"Number":     {keys: []string{"numbers"}, out: []string{"1"}},
+			"OK":         {keys: []string{"strings"}, out: []string{"4", "2"}},
 		}
 	)
 	for name, tt := range dt {
