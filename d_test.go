@@ -122,7 +122,8 @@ func TestD_Lookup(t *testing.T) {
 			out  interface{}
 			err  error
 		}{
-			"Default":       {in: &flat.D{}, err: flat.ErrNotFound},
+			"Default":       {err: flat.ErrNotFound},
+			"Blank":         {in: &flat.D{}, err: flat.ErrNotFound},
 			"Unknown group": {in: flat.New(d), keys: []string{"object", "a", "b"}, err: flat.ErrNotFound},
 			"Unknown value": {in: flat.New(d), keys: []string{"object", "b"}, err: flat.ErrNotFound},
 			"OK":            {in: flat.New(d), keys: []string{"object", "a"}, out: "b"},
@@ -230,134 +231,228 @@ func TestD_UnmarshalXML(t *testing.T) {
 
 func TestD_Bool(t *testing.T) {
 	var (
-		are = is.New(t)
 		d   = flat.New(map[string]interface{}{"bool": true})
+		are = is.New(t)
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out bool
+			err error
+		}{
+			"Default": {err: flat.ErrNotFound},
+			"Blank":   {keys: []string{"bool"}, err: flat.ErrNotFound},
+			"Unknown": {in: d, err: flat.ErrNotFound, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"bool"}, out: true},
+		}
 	)
-
-	// Unknown
-	v, err := d.Bool("oops")
-	are.True(errors.Is(err, flat.ErrNotFound)) // mismatch error
-	are.Equal(false, v)                        // mismatch default value
-
-	// OK
-	v, err = d.Bool("bool")
-	are.NoErr(err)     // unexpected error
-	are.Equal(true, v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out, err := tt.in.Bool(tt.keys...)
+			are.True(errors.Is(err, tt.err)) // mismatch error
+			are.Equal(tt.out, out)           // mismatch default value
+		})
+	}
 }
 
 func TestD_ShouldBool(t *testing.T) {
 	var (
-		are = is.New(t)
 		d   = flat.New(map[string]interface{}{"bool": true})
+		are = is.New(t)
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out bool
+		}{
+			"Default": {},
+			"Blank":   {keys: []string{"bool"}},
+			"Unknown": {in: d, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"bool"}, out: true},
+		}
 	)
-
-	// Unknown
-	v := d.ShouldBool("oops")
-	are.Equal(false, v) // mismatch default value
-
-	// OK
-	v = d.ShouldBool("bool")
-	are.Equal(true, v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out := tt.in.ShouldBool(tt.keys...)
+			are.Equal(tt.out, out)
+		})
+	}
 }
 
 func TestD_Float64(t *testing.T) {
 	var (
-		are = is.New(t)
 		f   = float64(3.14)
 		d   = flat.New(map[string]interface{}{"float64": f})
+		are = is.New(t)
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out float64
+			err error
+		}{
+			"Default": {err: flat.ErrNotFound},
+			"Blank":   {keys: []string{"float64"}, err: flat.ErrNotFound},
+			"Unknown": {in: d, err: flat.ErrNotFound, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"float64"}, out: f},
+		}
 	)
-
-	// Unknown
-	v, err := d.Float64("oops")
-	are.True(errors.Is(err, flat.ErrNotFound)) // mismatch error
-	are.Equal(float64(0), v)                   // mismatch default value
-
-	// OK
-	v, err = d.Float64("float64")
-	are.NoErr(err)  // unexpected error
-	are.Equal(f, v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out, err := tt.in.Float64(tt.keys...)
+			are.True(errors.Is(err, tt.err)) // mismatch error
+			are.Equal(tt.out, out)           // mismatch default value
+		})
+	}
 }
 
 func TestD_ShouldFloat64(t *testing.T) {
 	var (
-		are = is.New(t)
 		f   = float64(3.14)
 		d   = flat.New(map[string]interface{}{"float64": f})
+		are = is.New(t)
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out float64
+		}{
+			"Default": {},
+			"Blank":   {keys: []string{"float64"}},
+			"Unknown": {in: d, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"float64"}, out: f},
+		}
 	)
-
-	// Unknown
-	v := d.ShouldFloat64("oops")
-	are.Equal(float64(0), v) // mismatch default value
-
-	// OK
-	v = d.ShouldFloat64("float64")
-	are.Equal(f, v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out := tt.in.ShouldFloat64(tt.keys...)
+			are.Equal(tt.out, out)
+		})
+	}
 }
 
 func TestD_Int64(t *testing.T) {
 	var (
+		f   = float64(-42)
+		d   = flat.New(map[string]interface{}{"int64": f})
 		are = is.New(t)
-		d   = flat.New(map[string]interface{}{"int64": float64(-42)})
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out int64
+			err error
+		}{
+			"Default": {err: flat.ErrNotFound},
+			"Blank":   {keys: []string{"int64"}, err: flat.ErrNotFound},
+			"Unknown": {in: d, err: flat.ErrNotFound, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"int64"}, out: -42},
+		}
 	)
-
-	// Unknown
-	v, err := d.Int64("oops")
-	are.True(errors.Is(err, flat.ErrNotFound)) // mismatch error
-	are.Equal(int64(0), v)                     // mismatch default value
-
-	// OK
-	v, err = d.Int64("int64")
-	are.NoErr(err)           // unexpected error
-	are.Equal(int64(-42), v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out, err := tt.in.Int64(tt.keys...)
+			are.True(errors.Is(err, tt.err)) // mismatch error
+			are.Equal(tt.out, out)           // mismatch default value
+		})
+	}
 }
 
 func TestD_ShouldInt64(t *testing.T) {
 	var (
+		f   = float64(-42)
+		d   = flat.New(map[string]interface{}{"int64": f})
 		are = is.New(t)
-		d   = flat.New(map[string]interface{}{"int64": float64(-42)})
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out int64
+		}{
+			"Default": {},
+			"Blank":   {keys: []string{"int64"}},
+			"Unknown": {in: d, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"int64"}, out: -42},
+		}
 	)
-
-	// Unknown
-	v := d.ShouldInt64("oops")
-	are.Equal(int64(0), v) // mismatch default value
-
-	// OK
-	v = d.ShouldInt64("int64")
-	are.Equal(int64(-42), v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out := tt.in.ShouldInt64(tt.keys...)
+			are.Equal(tt.out, out)
+		})
+	}
 }
 
 func TestD_String(t *testing.T) {
 	var (
-		are = is.New(t)
 		s   = "hi"
-		d   = flat.New(map[string]interface{}{"string": s})
+		i   = "42"
+		d   = flat.New(map[string]interface{}{"string": s, "number": json.Number(i)})
+		are = is.New(t)
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out string
+			err error
+		}{
+			"Default": {err: flat.ErrNotFound},
+			"Blank":   {keys: []string{"string"}, err: flat.ErrNotFound},
+			"Unknown": {in: d, err: flat.ErrNotFound, keys: []string{"oops"}},
+			"Number":  {in: d, keys: []string{"number"}, out: i},
+			"OK":      {in: d, keys: []string{"string"}, out: s},
+		}
 	)
-
-	// Unknown
-	v, err := d.String("oops")
-	are.True(errors.Is(err, flat.ErrNotFound)) // mismatch error
-	are.Equal("", v)                           // mismatch default value
-
-	// OK
-	v, err = d.String("string")
-	are.NoErr(err)  // unexpected error
-	are.Equal(s, v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out, err := tt.in.String(tt.keys...)
+			are.True(errors.Is(err, tt.err)) // mismatch error
+			are.Equal(tt.out, out)           // mismatch default value
+		})
+	}
 }
 
 func TestD_ShouldString(t *testing.T) {
 	var (
-		are = is.New(t)
 		s   = "hi"
-		d   = flat.New(map[string]interface{}{"string": s})
+		i   = "42"
+		d   = flat.New(map[string]interface{}{"string": s, "number": json.Number(i)})
+		are = is.New(t)
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out string
+		}{
+			"Default": {},
+			"Blank":   {keys: []string{"string"}},
+			"Unknown": {in: d, keys: []string{"oops"}},
+			"Number":  {in: d, keys: []string{"number"}, out: i},
+			"OK":      {in: d, keys: []string{"string"}, out: s},
+		}
 	)
-
-	// Unknown
-	v := d.ShouldString("oops")
-	are.Equal("", v) // mismatch default value
-
-	// OK
-	v = d.ShouldString("string")
-	are.Equal(s, v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out := tt.in.ShouldString(tt.keys...)
+			are.Equal(tt.out, out)
+		})
+	}
 }
 
 func TestD_Strings(t *testing.T) {
@@ -425,32 +520,56 @@ func TestD_Time(t *testing.T) {
 
 func TestD_Uint64(t *testing.T) {
 	var (
+		f   = float64(42)
+		d   = flat.New(map[string]interface{}{"uint64": f})
 		are = is.New(t)
-		d   = flat.New(map[string]interface{}{"int64": float64(42)})
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out uint64
+			err error
+		}{
+			"Default": {err: flat.ErrNotFound},
+			"Blank":   {keys: []string{"uint64"}, err: flat.ErrNotFound},
+			"Unknown": {in: d, err: flat.ErrNotFound, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"uint64"}, out: 42},
+		}
 	)
-
-	// Unknown
-	v, err := d.Uint64("oops")
-	are.True(errors.Is(err, flat.ErrNotFound)) // mismatch error
-	are.Equal(uint64(0), v)                    // mismatch default value
-
-	// OK
-	v, err = d.Uint64("int64")
-	are.NoErr(err)           // unexpected error
-	are.Equal(uint64(42), v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out, err := tt.in.Uint64(tt.keys...)
+			are.True(errors.Is(err, tt.err)) // mismatch error
+			are.Equal(tt.out, out)           // mismatch default value
+		})
+	}
 }
 
 func TestD_ShouldUint64(t *testing.T) {
 	var (
+		f   = float64(42)
+		d   = flat.New(map[string]interface{}{"uint64": f})
 		are = is.New(t)
-		d   = flat.New(map[string]interface{}{"int64": float64(42)})
+		dt  = map[string]struct {
+			// inputs
+			in   *flat.D
+			keys []string
+			// outputs
+			out uint64
+		}{
+			"Default": {},
+			"Blank":   {keys: []string{"uint64"}},
+			"Unknown": {in: d, keys: []string{"oops"}},
+			"OK":      {in: d, keys: []string{"uint64"}, out: 42},
+		}
 	)
-
-	// Unknown
-	v := d.ShouldUint64("oops")
-	are.Equal(uint64(0), v) // mismatch default value
-
-	// OK
-	v = d.ShouldUint64("int64")
-	are.Equal(uint64(42), v) // mismatch value
+	for name, tt := range dt {
+		tt := tt
+		t.Run(name, func(t *testing.T) {
+			out := tt.in.ShouldUint64(tt.keys...)
+			are.Equal(tt.out, out)
+		})
+	}
 }

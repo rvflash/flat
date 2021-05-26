@@ -182,8 +182,8 @@ func commonPrefix(in map[string]interface{}) string {
 
 // Lookup retrieves the value behind these keys.
 // If the key is present, the value behind it is returned and the boolean is true.
-func (d D) Lookup(keys ...string) (interface{}, error) {
-	if len(keys) == 0 {
+func (d *D) Lookup(keys ...string) (interface{}, error) {
+	if d == nil || len(keys) == 0 {
 		return nil, ErrNotFound
 	}
 	var (
@@ -335,7 +335,7 @@ func xmlName(name xml.Name, space map[string]string) string {
 
 // Bool forces the returned value behind these keys as a bool.
 // An error is returned if the key does not exist or if the requested type is wrong.
-func (d D) Bool(keys ...string) (bool, error) {
+func (d *D) Bool(keys ...string) (bool, error) {
 	m, err := d.Lookup(keys...)
 	if err != nil {
 		return false, err
@@ -345,14 +345,14 @@ func (d D) Bool(keys ...string) (bool, error) {
 
 // ShouldBool returns the value behind these keys as a bool.
 // The default type value is used if the key does not exist or if the data failed to be cast as a boolean.
-func (d D) ShouldBool(keys ...string) bool {
+func (d *D) ShouldBool(keys ...string) bool {
 	v, _ := d.Bool(keys...)
 	return v
 }
 
 // Float64 forces the returned value behind these keys as a float64.
 // An error is returned if the key does not exist or if the requested type is wrong.
-func (d D) Float64(keys ...string) (float64, error) {
+func (d *D) Float64(keys ...string) (float64, error) {
 	m, err := d.Lookup(keys...)
 	if err != nil {
 		return 0, err
@@ -362,14 +362,14 @@ func (d D) Float64(keys ...string) (float64, error) {
 
 // ShouldFloat64 returns the value behind these keys as a float64.
 // The default type value is used if the key does not exist or if the data failed to be cast as a float64.
-func (d D) ShouldFloat64(keys ...string) float64 {
+func (d *D) ShouldFloat64(keys ...string) float64 {
 	v, _ := d.Float64(keys...)
 	return v
 }
 
 // Int64 forces the returned value behind these keys as an int64.
 // An error is returned if the key does not exist or if the requested type is wrong.
-func (d D) Int64(keys ...string) (int64, error) {
+func (d *D) Int64(keys ...string) (int64, error) {
 	m, err := d.Lookup(keys...)
 	if err != nil {
 		return 0, err
@@ -379,14 +379,14 @@ func (d D) Int64(keys ...string) (int64, error) {
 
 // ShouldInt64 returns the value behind these keys as an int64.
 // The default type value is used if the key does not exist or if the data failed to be cast as an int64.
-func (d D) ShouldInt64(keys ...string) int64 {
+func (d *D) ShouldInt64(keys ...string) int64 {
 	v, _ := d.Int64(keys...)
 	return v
 }
 
 // String forces the returned value behind these keys as a string.
 // An error is returned if the key does not exist or if the requested type is wrong.
-func (d D) String(keys ...string) (string, error) {
+func (d *D) String(keys ...string) (string, error) {
 	m, err := d.Lookup(keys...)
 	if err != nil {
 		return "", err
@@ -396,13 +396,13 @@ func (d D) String(keys ...string) (string, error) {
 
 // ShouldString returns the value behind these keys as a string.
 // The default type value is used if the key does not exist or if the data failed to be cast as a string.
-func (d D) ShouldString(keys ...string) string {
+func (d *D) ShouldString(keys ...string) string {
 	v, _ := d.String(keys...)
 	return v
 }
 
 // Strings returns if exists, the content of the given key as a slice of strings.
-func (d D) Strings(keys ...string) ([]string, error) {
+func (d *D) Strings(keys ...string) ([]string, error) {
 	m, err := d.Lookup(keys...)
 	if err != nil {
 		return nil, err
@@ -423,7 +423,7 @@ func (d D) Strings(keys ...string) ([]string, error) {
 }
 
 // Time tries to return the value behind the key as a time.Time matching the given time layout.
-func (d D) Time(layout string, keys ...string) (time.Time, error) {
+func (d *D) Time(layout string, keys ...string) (time.Time, error) {
 	m, err := d.Lookup(keys...)
 	if err != nil {
 		return time.Time{}, err
@@ -437,14 +437,14 @@ func (d D) Time(layout string, keys ...string) (time.Time, error) {
 
 // ShouldTime returns the value behind these keys as a time.Time.
 // The default type value is used if the key does not exist or if the data failed to be cast as a time.Time.
-func (d D) ShouldTime(layout string, keys ...string) time.Time {
+func (d *D) ShouldTime(layout string, keys ...string) time.Time {
 	v, _ := d.Time(layout, keys...)
 	return v
 }
 
 // Uint64 forces the returned value behind these keys as an uint64.
 // An error is returned if the key does not exist or if the requested type is wrong.
-func (d D) Uint64(keys ...string) (uint64, error) {
+func (d *D) Uint64(keys ...string) (uint64, error) {
 	m, err := d.Lookup(keys...)
 	if err != nil {
 		return 0, err
@@ -454,7 +454,7 @@ func (d D) Uint64(keys ...string) (uint64, error) {
 
 // ShouldUint64 returns the value behind these keys as an uint64.
 // The default type value is used if the key does not exist or if the data failed to be cast as an uint64.
-func (d D) ShouldUint64(keys ...string) uint64 {
+func (d *D) ShouldUint64(keys ...string) uint64 {
 	v, _ := d.Uint64(keys...)
 	return v
 }
