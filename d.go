@@ -15,6 +15,8 @@ import (
 	"time"
 
 	"github.com/rvflash/naming"
+
+	"gopkg.in/yaml.v3"
 )
 
 // Settings allows to customize the data during the marshalling or unmarshalling processes.
@@ -99,8 +101,8 @@ const (
 // Flatten allows to export D in a single dimension.
 // Any of its properties, absent from the list of ignored keys, are lifted to the first level.
 // Each property has a new name, using the snake case, based on names of its hierarchy.
-// Common prefix in keys name are omitted to limit the length of each ones.
-func (d D) Flatten(ignoredKeys ...[]string) map[string]interface{} {
+// Common prefix in keys name are omitted to limit the length of each one.
+func (d *D) Flatten(ignoredKeys ...[]string) map[string]interface{} {
 	if len(d.D) == 0 {
 		return nil
 	}
@@ -204,13 +206,32 @@ func (d *D) Lookup(keys ...string) (interface{}, error) {
 	return v, nil
 }
 
+// YAMLEncode YAML encodes D into w.
+func (d *D) YAMLEncode(w io.Writer) error {
+	return yaml.NewEncoder(w).Encode(d)
+}
+
+// MarshalYAML implements the yaml.Marshaler interface.
+func (d *D) MarshalYAML() (interface{}, error) {
+	return d.D, nil
+}
+
+// UnmarshalYAML implements the yaml.Unmarshaler interface.
+func (d *D) UnmarshalYAML(n *yaml.Node) (err error) {
+	if n == nil {
+		d.D = nil
+		return
+	}
+	return n.Decode(&d.D)
+}
+
 // JSONEncode JSON encodes D into w.
-func (d D) JSONEncode(w io.Writer) error {
+func (d *D) JSONEncode(w io.Writer) error {
 	return json.NewEncoder(w).Encode(d)
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (d D) MarshalJSON() ([]byte, error) {
+func (d *D) MarshalJSON() ([]byte, error) {
 	return json.Marshal(d.D)
 }
 
@@ -226,12 +247,12 @@ func (d *D) UnmarshalJSON(b []byte) (err error) {
 }
 
 // XMLEncode XML encodes D into w.
-func (d D) XMLEncode(w io.Writer) error {
+func (d *D) XMLEncode(w io.Writer) error {
 	return xml.NewEncoder(w).Encode(d)
 }
 
 // MarshalXML implements the xml.Marshaler interface.
-func (d D) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
+func (d *D) MarshalXML(enc *xml.Encoder, start xml.StartElement) error {
 	if len(d.D) == 0 {
 		return nil
 	}
