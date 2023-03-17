@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Hervé Gouchet. All rights reserved.
+// Copyright (c) 2021 Hervé Gouchet. All rights reserved.
 // Use of this source code is governed by the MIT License
 // that can be found in the LICENSE file.
 
@@ -15,6 +15,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"github.com/matryer/is"
 	"github.com/rvflash/flat"
+
+	"gopkg.in/yaml.v3"
 )
 
 const (
@@ -49,6 +51,18 @@ const (
   <string>Hello World</string>
 </root>
 `
+	yamlStr = `array:
+- 1
+- 2
+- 3
+boolean: true
+'null':
+number: 123
+object:
+  a: b
+  c: d
+  e: f
+string: Hello World`
 )
 
 func TestD_Flatten(t *testing.T) {
@@ -227,6 +241,46 @@ func TestD_UnmarshalXML(t *testing.T) {
 		"object_e":   "f",
 		"string":     "Hello World",
 	}))
+}
+
+func TestD_YAMLEncode(t *testing.T) {
+	var (
+		are = is.New(t)
+		buf = bytes.Buffer{}
+		err = flat.New(nil).YAMLEncode(&buf)
+	)
+	are.NoErr(err)                  // unexpected error
+	are.Equal("{}\n", buf.String()) // mismatch value
+}
+
+func TestD_UnmarshalYAML(t *testing.T) {
+	var (
+		d   = flat.D{}
+		are = is.New(t)
+		buf = []byte(yamlStr)
+		err = yaml.Unmarshal(buf, &d)
+	)
+	are.NoErr(err)
+	are.Equal("", cmp.Diff(d.Flatten(), map[string]interface{}{
+		"array":    []interface{}{1, 2, 3},
+		"boolean":  true,
+		"null":     nil,
+		"number":   123,
+		"object_a": "b",
+		"object_c": "d",
+		"object_e": "f",
+		"string":   "Hello World",
+	}))
+}
+
+func TestD_UnmarshalYAML2(t *testing.T) {
+	var (
+		are = is.New(t)
+		d   = flat.D{}
+		err = d.UnmarshalYAML(nil)
+	)
+	are.NoErr(err)              // unexpected error
+	are.Equal(nil, d.Flatten()) // mismatch value
 }
 
 func TestD_Bool(t *testing.T) {

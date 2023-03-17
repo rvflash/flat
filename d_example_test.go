@@ -1,4 +1,4 @@
-// Copyright (c) 2020 Hervé Gouchet. All rights reserved.
+// Copyright (c) 2021 Hervé Gouchet. All rights reserved.
 // Use of this source code is governed by the MIT License
 // that can be found in the LICENSE file.
 
@@ -10,6 +10,8 @@ import (
 	"fmt"
 
 	"github.com/rvflash/flat"
+
+	"gopkg.in/yaml.v3"
 )
 
 func ExampleD_XMLEncode() {
@@ -49,4 +51,24 @@ func ExampleD_UnmarshalXML() {
 	fmt.Printf("%#v", d.Flatten())
 	// Output:
 	// map[string]interface {}{"languages_fr":"French"}
+}
+
+func ExampleD_UnmarshalYAML() {
+	var (
+		d   = flat.D{}
+		err = yaml.Unmarshal([]byte(`db:
+    host: localhost
+    name: database
+    user:
+        login: root
+        pass: "insecure"
+http:
+    timeout: 0`), &d)
+	)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Printf("%#v", d.Flatten())
+	// Output:
+	// map[string]interface {}{"db_host":"localhost", "db_name":"database", "db_user_login":"root", "db_user_pass":"insecure", "http_timeout":0}
 }
